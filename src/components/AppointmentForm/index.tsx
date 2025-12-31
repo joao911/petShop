@@ -33,6 +33,7 @@ import {
   CalendarIcon,
   ChevronDownIcon,
   Clock,
+  Loader2,
 } from 'lucide-react';
 import { IMaskInput } from 'react-imask';
 import { startOfToday, format, setMinutes, setHours } from 'date-fns';
@@ -46,6 +47,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { toast } from 'sonner';
+import { createAppointment } from '@/app/actions';
 
 const appointmentsFormSchema = z
   .object({
@@ -88,11 +91,28 @@ export const AppointmentForm = () => {
       phone: '',
       description: '',
       scheduleAt: undefined,
+      time: '',
     },
   });
 
-  const onSubmit = (data: AppointmentsFormSchemaType) => {
+  const onSubmit = async (data: AppointmentsFormSchemaType) => {
     console.log('Dados do agendamento:', data);
+    const { tutorName, petName, phone, description, scheduleAt, time } = data;
+    const [hour, minute] = time.split(':');
+
+    const formatedScheduleAt = setMinutes(
+      setHours(scheduleAt, Number(hour)),
+      Number(minute)
+    );
+    await createAppointment({
+      tutorName,
+      petName,
+      phone,
+      description,
+      scheduleAt: formatedScheduleAt,
+    });
+
+    toast.success('Agendamento realizado com sucesso!');
   };
 
   return (
@@ -289,8 +309,15 @@ export const AppointmentForm = () => {
               />
             </div>
 
-            <DialogFooter>
-              <Button type="submit" variant="brand">
+            <DialogFooter className="flex justify-end">
+              <Button
+                type="submit"
+                variant="brand"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Agendar
               </Button>
             </DialogFooter>
