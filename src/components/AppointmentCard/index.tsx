@@ -8,6 +8,7 @@ import { Pen, Trash } from 'lucide-react';
 import { deleteAppointment } from '@/app/actions';
 import { ModalConfirm } from '../ModalConfirm';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface AppointmentCardProps {
   appointment: IAppointment;
@@ -19,13 +20,22 @@ export const AppointmentCard = ({
   isFirstInSection,
 }: AppointmentCardProps) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleCancel = () => {
     setOpen(false);
   };
 
   const handleConfirm = async () => {
-    await deleteAppointment(appointment.id);
-    setOpen(false);
+    try {
+      setLoading(true);
+      await deleteAppointment(appointment.id);
+      setOpen(false);
+      toast.success('Agendamento deletado com sucesso');
+    } catch (error) {
+      toast.error('Nao foi possível deletar o agendamento');
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div
@@ -70,6 +80,7 @@ export const AppointmentCard = ({
           handleConfirm={handleConfirm}
           open={open}
           setOpen={setOpen}
+          loading={loading}
           title="Excluir agendamento"
           description="Tem certeza que deseja excluir esse agendamento? Esta ação nao pode ser desfeita."
         >

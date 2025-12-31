@@ -1,5 +1,5 @@
 'use client';
-
+import { LoaderCircle } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogTitle,
@@ -20,6 +20,7 @@ interface ModalConfirmProps {
   handleCancel: () => void;
   open: boolean;
   setOpen: (open: boolean) => void;
+  loading: boolean;
 }
 
 export const ModalConfirm = ({
@@ -30,6 +31,7 @@ export const ModalConfirm = ({
   handleConfirm,
   open,
   setOpen,
+  loading,
 }: ModalConfirmProps) => {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -40,8 +42,11 @@ export const ModalConfirm = ({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
+          <AlertDialogCancel disabled={loading} onClick={handleCancel}>
+            Cancelar
+          </AlertDialogCancel>
+          <AlertDialogAction disabled={loading} onClick={handleConfirm}>
+            {loading && <LoaderCircle className="animate-spin" />}
             Confirmar
           </AlertDialogAction>
         </AlertDialogFooter>
