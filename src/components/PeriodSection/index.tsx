@@ -7,8 +7,6 @@ interface PeriodSectionProps {
 }
 
 export const PeriodSection = ({ period }: PeriodSectionProps) => {
-  console.log('period', period);
-
   const periodIcons = {
     morning: <Sun className="text-accent-blue" />,
     afternoon: <Cloudy className="text-accent-orange" />,
@@ -39,7 +37,9 @@ export const PeriodSection = ({ period }: PeriodSectionProps) => {
           </div>
         </div>
       ) : (
-        <p>Nenhum agendamento para esse horário</p>
+        <p className="text-paragraph-small-size text-content-secondary p-5">
+          Nenhum agendamento para esse horário
+        </p>
       )}
     </section>
   );
