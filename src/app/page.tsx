@@ -3,14 +3,10 @@ import { PeriodSection } from '@/components/PeriodSection';
 import { Button } from '@/components/ui/button';
 import { prisma } from '@/lib/prisma';
 
-import {
-  groupAppointmentsByPeriod,
-  mockAppointments,
-} from '@/utils/appointments-utils';
+import { groupAppointmentsByPeriod } from '@/utils/appointments-utils';
 
 export default async function Home() {
   const appointment = await prisma.appointment.findMany();
-  console.log('appointment', appointment);
   const periods = groupAppointmentsByPeriod(appointment);
 
   return (
