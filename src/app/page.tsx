@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 
 import { groupAppointmentsByPeriod } from '@/utils/appointments-utils';
 import { endOfDay, parseISO, startOfDay } from 'date-fns';
+import { Suspense } from 'react';
 
 export default async function Home({
   searchParams,
@@ -42,12 +43,16 @@ export default async function Home({
           </p>
         </div>
         <div className="hidden md:flex items-center gap-4">
-          <DatePicker />
+          <Suspense fallback={null}>
+            <DatePicker />
+          </Suspense>
         </div>
       </div>
 
       <div className="mt-3 mb-8 md:hidden">
-        <DatePicker />
+        <Suspense fallback={null}>
+          <DatePicker />
+        </Suspense>
       </div>
 
       {periods.map((period, index) => (
