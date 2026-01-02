@@ -7,11 +7,15 @@ import { prisma } from '@/lib/prisma';
 import { groupAppointmentsByPeriod } from '@/utils/appointments-utils';
 import { endOfDay, parseISO, startOfDay } from 'date-fns';
 
-export default async function Home(searchParams: {
-  searchParams: Promise<{ data?: string }>;
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { date?: string };
 }) {
-  const { date } = await searchParams;
-  const selectedDate = date ? parseISO(date) : new Date();
+  const selectedDate = searchParams.date
+    ? parseISO(searchParams.date)
+    : new Date();
+
   const appointments = await prisma.appointment.findMany({
     where: {
       scheduleAt: {
@@ -23,6 +27,7 @@ export default async function Home(searchParams: {
       scheduleAt: 'asc',
     },
   });
+
   const periods = groupAppointmentsByPeriod(appointments);
 
   return (
@@ -40,12 +45,15 @@ export default async function Home(searchParams: {
           <DatePicker />
         </div>
       </div>
+
       <div className="mt-3 mb-8 md:hidden">
         <DatePicker />
       </div>
+
       {periods.map((period, index) => (
         <PeriodSection period={period} key={index} />
       ))}
+
       <div className="fixed bottom-0 right-0 left-0 flex justify-center bg-background-tertiary py-18 px-6 md:bottom-6 md:right-6 md:left-auto md:top-auto md:w-auto md:bg-transparent md:p-0">
         <AppointmentForm>
           <Button variant="brand">Novo agendamento</Button>
