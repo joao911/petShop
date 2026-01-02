@@ -1,17 +1,34 @@
 import { AppointmentForm } from '@/components/AppointmentForm';
+import { DatePicker } from '@/components/DatePicker';
 import { PeriodSection } from '@/components/PeriodSection';
 import { Button } from '@/components/ui/button';
 import { prisma } from '@/lib/prisma';
 
-import {
-  groupAppointmentsByPeriod,
-  mockAppointments,
-} from '@/utils/appointments-utils';
+import { groupAppointmentsByPeriod } from '@/utils/appointments-utils';
+import { endOfDay, parseISO, startOfDay } from 'date-fns';
 
-export default async function Home() {
-  const appointment = await prisma.appointment.findMany();
-  console.log('appointment', appointment);
-  const periods = groupAppointmentsByPeriod(appointment);
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { date?: string };
+}) {
+  const selectedDate = searchParams.date
+    ? parseISO(searchParams.date)
+    : new Date();
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      scheduleAt: {
+        gte: startOfDay(selectedDate),
+        lte: endOfDay(selectedDate),
+      },
+    },
+    orderBy: {
+      scheduleAt: 'asc',
+    },
+  });
+
+  const periods = groupAppointmentsByPeriod(appointments);
 
   return (
     <div className="bg-background-primary p-6">
@@ -24,10 +41,19 @@ export default async function Home() {
             Aqui você pode ver todos os clientes e serviços agendados para você
           </p>
         </div>
+        <div className="hidden md:flex items-center gap-4">
+          <DatePicker />
+        </div>
       </div>
+
+      <div className="mt-3 mb-8 md:hidden">
+        <DatePicker />
+      </div>
+
       {periods.map((period, index) => (
         <PeriodSection period={period} key={index} />
       ))}
+
       <div className="fixed bottom-0 right-0 left-0 flex justify-center bg-background-tertiary py-18 px-6 md:bottom-6 md:right-6 md:left-auto md:top-auto md:w-auto md:bg-transparent md:p-0">
         <AppointmentForm>
           <Button variant="brand">Novo agendamento</Button>
